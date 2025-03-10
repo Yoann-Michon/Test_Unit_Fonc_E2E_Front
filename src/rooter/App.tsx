@@ -9,7 +9,6 @@ import SignIn from "../pages/SignIn";
 import SignUp from "../pages/SignUp";
 import Home from "../pages/Home";
 import Dashboard from "../pages/dashboard/Dashboard";
-import Bookings from "../pages/dashboard/Bookings";
 import Profile from "../pages/dashboard/Profile";
 import DashboardHome from "../pages/dashboard/DashboardHome";
 import User from "../pages/dashboard/Users";
@@ -54,7 +53,6 @@ const App = () => {
             <Route path="hotel" element={<DashboardHotel />} />
             <Route path="hotel/:id" element={<DashboardHotelDetails />} />
             <Route path="user" element={<User />} />
-            <Route path="booking" element={<Bookings />} />
             <Route path="profile" element={<Profile />} />
           </Route>
         </Route>
