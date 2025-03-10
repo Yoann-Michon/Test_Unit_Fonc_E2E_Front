@@ -2,6 +2,7 @@ import Joi from 'joi';
 
 
 export const HotelSchema = Joi.object({
+  id: Joi.string().optional(),
   name: Joi.string()
     .min(3)
     .max(50)
@@ -12,6 +13,17 @@ export const HotelSchema = Joi.object({
       'string.min': '"name" should have a minimum length of 3',
       'string.max': '"name" should have a maximum length of 50',
       'any.required': '"name" is a required field'
+    }),
+    street: Joi.string()
+    .min(3)
+    .max(100)
+    .required()
+    .messages({
+      'string.base': '"street" should be a type of text',
+      'string.empty': '"street" cannot be an empty field',
+      'string.min': '"street" should have a minimum length of 3',
+      'string.max': '"street" should have a maximum length of 100',
+      'any.required': '"street" is a required field'
     }),
 
   location: Joi.string()

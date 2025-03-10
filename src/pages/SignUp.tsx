@@ -85,7 +85,6 @@ export default function SignUp() {
 
     try {
       const response = await AuthService.signUp(formData);
-      console.log("handleSubmit ", response);
 
       if (!response) throw new Error("Error during sign up");
 
@@ -93,7 +92,6 @@ export default function SignUp() {
       setSnackbarOpen(true);
       navigate("/dashboard");
     } catch (err) {
-      console.error(err);
       setSnackbarMessage("An error occurred, please try again.");
       setSnackbarOpen(true);
     }

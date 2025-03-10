@@ -10,8 +10,6 @@ export const AuthService = {
         body: JSON.stringify(user),
       }
     );
-    console.log(response);
-    console.log(user);
 
     if (!response.ok) throw new Error("Error during sign up");
 
@@ -31,7 +29,6 @@ export const AuthService = {
     if (!response.ok) throw new Error("Incorrect email or password");
 
     const data = await response.json();
-    console.log(data);
 
     localStorage.setItem("token", data.token);
     return data;

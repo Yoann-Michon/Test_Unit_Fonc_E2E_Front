@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { HotelCards } from "../components/HotelCards";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
 import { hotelService } from "../services/Hotel.service";
 import Search from "../components/Search";
 import { IHotel } from "../models/Hotel.interface";

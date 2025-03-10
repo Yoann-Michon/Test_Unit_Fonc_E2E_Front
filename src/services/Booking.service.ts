@@ -6,7 +6,6 @@ export const bookingService = {
     try {
       const token = AuthService.getToken();
       const decodedToken = AuthService.decodeToken();
-
       const userRole = decodedToken.role;
       if (!userRole) {
         throw new Error("Role not found in token");
@@ -27,7 +26,6 @@ export const bookingService = {
         },
       });
 
-      console.log(response);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -40,11 +38,11 @@ export const bookingService = {
       }
 
       const data = await response.json();
+      
       return data.data as IBooking[];
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred";
-      console.error(errorMessage);
       throw new Error(errorMessage);
     }
   },
@@ -85,17 +83,12 @@ export const bookingService = {
     }
   },
 
-  async createBooking(bookingData: IBooking) {
+  async createBooking(bookingData: Partial<IBooking>) {
     try {
       const token = AuthService.getToken();
       if (!token) {
         throw new Error("User not authenticated");
       }
-      const userId = AuthService.getUserInfo();
-      
-      bookingData.userId=userId?.id
-      console.log(bookingData);
-      
 
       const response = await fetch(
         `${import.meta.env.VITE_BACK_API_URL}/booking`,

@@ -1,8 +1,7 @@
 export interface IBooking {
   id?: string; 
   checkInDate: Date; 
-  checkOutDate: Date; 
-  createdAt: Date; 
+  checkOutDate: Date;
   userId: string; 
   hotelId: string;
 }
