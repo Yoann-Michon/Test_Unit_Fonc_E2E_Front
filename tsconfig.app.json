@@ -17,10 +17,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "types": ["cypress"]  // Ajoute cette ligne pour inclure les types Cypress
+    "types": ["cypress", "jest", "@testing-library/jest-dom"]
   },
   "include": [
     "src",               // Inclure ton code source principal
-    "cypress/**/*.ts"    // Inclure tes tests Cypress
+    "cypress/**/*.ts",    // Inclure tes tests Cypress
+    "src/tests/**/*.test.tsx",       // Ajouter un dossier de tests pour Jest
+    "src/tests/**/*.ts",
   ]
 }
