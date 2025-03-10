@@ -138,7 +138,7 @@ export default function User() {
       
       setSnackbar({
         open: true,
-        message: 'Utilisateur mis à jour avec succès',
+        message: 'User updated successfully',
         severity: 'success'
       });
       
@@ -146,7 +146,7 @@ export default function User() {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: err instanceof Error ? err.message : "Erreur lors de la mise à jour de l'utilisateur",
+        message: err instanceof Error ? err.message : "Error updating user",
         severity: 'error'
       });
     } finally {
@@ -170,7 +170,7 @@ export default function User() {
       
       setSnackbar({
         open: true,
-        message: 'Utilisateur supprimé avec succès',
+        message: 'User deleted successfully',
         severity: 'success'
       });
       
@@ -178,7 +178,7 @@ export default function User() {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: err instanceof Error ? err.message : "Erreur lors de la suppression de l'utilisateur",
+        message: err instanceof Error ? err.message : "Error deleting user",
         severity: 'error'
       });
     } finally {
@@ -218,7 +218,7 @@ export default function User() {
           <Search
             onSearch={handleSearch}
             searchService={searchUsersService}
-            placeholder="Rechercher un utilisateur..."
+            placeholder="Search for a user..."
           />
         </Box>
         <Divider sx={{ width: "100%" }} />
@@ -235,7 +235,7 @@ export default function User() {
                   <TableCell>Lastname</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Username</TableCell>
-                  <TableCell>Rôle</TableCell>
+                  <TableCell>Role</TableCell>
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
@@ -244,7 +244,7 @@ export default function User() {
                   <TableRow>
                     <TableCell colSpan={6} align="center">
                       <Typography variant="body1" sx={{ py: 2 }}>
-                        Aucun utilisateur trouvé
+                        No users found
                       </Typography>
                     </TableCell>
                   </TableRow>
@@ -286,14 +286,14 @@ export default function User() {
           <Box component="form" sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
               fullWidth
-              label="Prénom"
+              label="First name"
               name="firstname"
               value={editedUser.firstname || ''}
               onChange={handleInputChange}
             />
             <TextField
               fullWidth
-              label="Nom"
+              label="Last name"
               name="lastname"
               value={editedUser.lastname || ''}
               onChange={handleInputChange}
@@ -307,12 +307,12 @@ export default function User() {
               disabled
             />
             <FormControl fullWidth>
-              <InputLabel id="role-select-label">Rôle</InputLabel>
+              <InputLabel id="role-select-label">Role</InputLabel>
               <Select
                 labelId="role-select-label"
                 name="role"
                 value={editedUser.role || ''}
-                label="Rôle"
+                label="Role"
                 onChange={handleSelectChange}
               >
                 <MenuItem value="admin">Admin</MenuItem>
@@ -322,7 +322,7 @@ export default function User() {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialogOpen(false)}>Annuler</Button>
+          <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleEditSubmit} variant="contained" color="primary">
             Save
           </Button>
@@ -330,19 +330,19 @@ export default function User() {
       </Dialog>
 
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>Confirmer la suppression</DialogTitle>
+        <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            Êtes-vous sûr de vouloir supprimer l'utilisateur {userToDelete?.firstname} {userToDelete?.lastname} ({userToDelete?.email}) ?
+            Are you sure you want to delete the user {userToDelete?.firstname} {userToDelete?.lastname} ({userToDelete?.email})?
           </Typography>
           <Typography variant="body2" color="error" sx={{ mt: 2 }}>
-            Cette action est irréversible.
+            This action is irreversible.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialogOpen(false)}>Annuler</Button>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleDeleteConfirm} variant="contained" color="error">
-            Supprimer
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

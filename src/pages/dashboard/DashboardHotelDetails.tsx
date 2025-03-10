@@ -105,8 +105,8 @@ export const DashboardHotelDetails = () => {
         return;
       }
 
-      const checkInDate = checkIn.format("YYYY-MM-DD");
-      const checkOutDate = checkOut.format("YYYY-MM-DD");
+      const checkInDate = checkIn.toDate();
+      const checkOutDate = checkOut.toDate();
 
       if (!id) {
         showSnackbar("Invalid hotel ID", "error");
@@ -122,7 +122,7 @@ export const DashboardHotelDetails = () => {
       await bookingService.createBooking(bookingData);
       showSnackbar("Booking successfully created!", "success");
       setTimeout(() => {
-        navigate("/dashboard/bookings");
+        navigate("/dashboard/booking");
       }, 2000);
     } catch (err) {
       const errorMessage =
