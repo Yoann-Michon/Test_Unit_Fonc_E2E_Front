@@ -161,12 +161,15 @@ export default function User() {
 
   const handleDeleteConfirm = async () => {
     if (!userToDelete) return;
-    
     try {
       setLoading(true);
-      await userService.deleteUser(userToDelete.email);
+      if (userToDelete.id) {
+        await userService.deleteUser(userToDelete.id);
+      } else {
+        throw new Error("User ID is undefined");
+      }
       
-      setUsers(users.filter(user => user.email !== userToDelete.email));
+      setUsers(users.filter(user => user.id !== userToDelete.id));
       
       setSnackbar({
         open: true,

@@ -26,7 +26,6 @@ export const bookingService = {
         },
       });
 
-      console.log(response);
 
       if (!response.ok) {
         if (response.status === 401) {
@@ -39,13 +38,11 @@ export const bookingService = {
       }
 
       const data = await response.json();
-      console.log(data.data);
       
       return data.data as IBooking[];
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "An error occurred";
-      console.error(errorMessage);
       throw new Error(errorMessage);
     }
   },

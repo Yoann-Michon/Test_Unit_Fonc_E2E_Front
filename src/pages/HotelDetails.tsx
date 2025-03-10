@@ -37,7 +37,6 @@ export const HotelDetails = () => {
         setLoading(true);
         if (id) {
           const hotelData = await hotelService.getHotelById(id);
-          console.log(hotelData);
 
           setHotel(hotelData);
         } else {

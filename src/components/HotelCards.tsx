@@ -122,6 +122,9 @@ export const HotelCards = ({
               >
                 <LocationOnIcon fontSize="small" />
                 <Typography variant="body2" color="text.secondary">
+                  {hotel.street}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
                   {hotel.location}
                 </Typography>
               </Box>

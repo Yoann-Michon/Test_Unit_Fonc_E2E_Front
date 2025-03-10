@@ -9,13 +9,16 @@ export const userService = {
         throw new Error("No token found. Please log in.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error fetching users: ${response.statusText}`);
@@ -24,7 +27,6 @@ export const userService = {
       const data = await response.json();
       return data.data as IUser[];
     } catch (error) {
-      console.error("Error fetching users:", error);
       throw error;
     }
   },
@@ -36,22 +38,26 @@ export const userService = {
         throw new Error("No token found. Please log in.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user/${email}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user/${email}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`Error fetching user with ID ${email}: ${response.statusText}`);
+        throw new Error(
+          `Error fetching user with ID ${email}: ${response.statusText}`
+        );
       }
 
       const data = await response.json();
       return data.data as IUser;
     } catch (error) {
-      console.error(`Error fetching user with email ${email}:`, error);
       throw error;
     }
   },
@@ -63,22 +69,26 @@ export const userService = {
         throw new Error("No token found. Please log in.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user/${id}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user/${id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`Error fetching user with ID ${id}: ${response.statusText}`);
+        throw new Error(
+          `Error fetching user with ID ${id}: ${response.statusText}`
+        );
       }
 
       const data = await response.json();
       return data.data as IUser;
     } catch (error) {
-      console.error(`Error fetching user with ID ${id}:`, error);
       throw error;
     }
   },
@@ -90,13 +100,16 @@ export const userService = {
         throw new Error("No token found. Please log in.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user/search/${query}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user/search/${query}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error searching for users: ${response.statusText}`);
@@ -105,7 +118,6 @@ export const userService = {
       const data = await response.json();
       return data.data as IUser[];
     } catch (error) {
-      console.error("Error searching users:", error);
       throw error;
     }
   },
@@ -117,14 +129,17 @@ export const userService = {
         throw new Error("No token found. Please log in.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-        body: JSON.stringify(user),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(user),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error creating user: ${response.statusText}`);
@@ -133,43 +148,42 @@ export const userService = {
       const data = await response.json();
       return data.data as IUser;
     } catch (error) {
-      console.error("Error creating user:", error);
       throw error;
     }
   },
 
   async updateUser(id: string, userData: Partial<IUser>) {
     try {
-        const token = AuthService.getToken();
-        if (!token) {
-            throw new Error("No token found. Please log in.");
+      const token = AuthService.getToken();
+      if (!token) {
+        throw new Error("No token found. Please log in.");
+      }
+      console.log(userData);
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(userData),
         }
+      );
 
-        console.log("Updating user:", userData);
+      if (!response.ok) {
+        throw new Error(
+          `Error updating user with ID ${id}: ${response.statusText}`
+        );
+      }
 
-        const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-            },
-            body: JSON.stringify(userData),
-        });
-
-        console.log(response);
-        
-        if (!response.ok) {
-            throw new Error(`Error updating user with ID ${id}: ${response.statusText}`);
-        }
-
-        const data = await response.json();
-        return data.data as IUser;
+      const data = await response.json();
+      return data.data as IUser;
     } catch (error) {
-        console.error(`Error updating user with ID ${id}:`, error);
-        throw error;
+      throw error;
     }
-},
-
+  },
 
   async deleteUser(id: string) {
     try {
@@ -178,23 +192,27 @@ export const userService = {
         throw new Error("No token found. Please log in.");
       }
 
-      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/user/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`Error deleting user with ID ${id}: ${response.statusText}`);
+        throw new Error(
+          `Error deleting user with ID ${id}: ${response.statusText}`
+        );
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error(`Error deleting user with ID ${id}:`, error);
       throw error;
     }
-  }
+  },
 };

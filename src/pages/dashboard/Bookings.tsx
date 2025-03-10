@@ -37,7 +37,9 @@ const Bookings = () => {
   const [bookingToDelete, setBookingToDelete] = useState<IBooking | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">("success");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
 
   useEffect(() => {
     const checkPermissions = () => setIsAdmin(AuthService.isAdmin());
@@ -91,7 +93,11 @@ const Bookings = () => {
 
     try {
       setLoading(true);
-      const updatedBooking: IBooking = { ...editingBooking, checkInDate: checkIn, checkOutDate: checkOut };
+      const updatedBooking: IBooking = {
+        ...editingBooking,
+        checkInDate: checkIn,
+        checkOutDate: checkOut,
+      };
       const result = await bookingService.updateBooking(updatedBooking);
 
       setBookings(bookings.map((b) => (b.id === result.id ? result : b)));
@@ -99,7 +105,10 @@ const Bookings = () => {
       handleCloseDialog();
       showSnackbar("Booking updated successfully", "success");
     } catch (err) {
-      showSnackbar(err instanceof Error ? err.message : "Error updating booking", "error");
+      showSnackbar(
+        err instanceof Error ? err.message : "Error updating booking",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -120,7 +129,10 @@ const Bookings = () => {
       setDeleteDialogOpen(false);
       showSnackbar("Booking deleted successfully", "success");
     } catch (err) {
-      showSnackbar(err instanceof Error ? err.message : "Error deleting booking", "error");
+      showSnackbar(
+        err instanceof Error ? err.message : "Error deleting booking",
+        "error"
+      );
     } finally {
       setLoading(false);
     }
@@ -151,8 +163,19 @@ const Bookings = () => {
   }
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+    <Box
+      sx={{
+        p: 3,
+        display: "flex",
+        flexDirection: "column",
+        textAlign: "center",
+        height: "100vh",
+        width: "100%",
+        justifyContent: "flex-start",
+        alignItems: "center",
+      }}
+    >
+      <Typography variant="h4" gutterBottom alignSelf="start">
         {isAdmin ? "Bookings" : "My Bookings"}
       </Typography>
 
@@ -172,17 +195,32 @@ const Bookings = () => {
             {bookings.map((booking) => (
               <TableRow key={booking.id}>
                 <TableCell>{booking.hotel?.name}</TableCell>
-                <TableCell>{new Date(booking.checkInDate).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(booking.checkOutDate).toLocaleDateString()}</TableCell>
+                <TableCell>
+                  {new Date(booking.checkInDate).toLocaleDateString()}
+                </TableCell>
+                <TableCell>
+                  {new Date(booking.checkOutDate).toLocaleDateString()}
+                </TableCell>
                 <TableCell>{booking.totalPrice} €</TableCell>
                 {isAdmin && (
-                  <TableCell>{booking.user?.firstname} {booking.user?.lastname}</TableCell>
+                  <TableCell>
+                    {booking.user?.firstname} {booking.user?.lastname}
+                  </TableCell>
                 )}
                 <TableCell>
-                  <IconButton onClick={() => handleEditBooking(booking)} color="primary" >
+                  <IconButton
+                    onClick={() => handleEditBooking(booking)}
+                    color="primary"
+                  >
                     <Edit />
                   </IconButton>
-                  <IconButton onClick={() => { setBookingToDelete(booking); setDeleteDialogOpen(true); }} color="error" >
+                  <IconButton
+                    onClick={() => {
+                      setBookingToDelete(booking);
+                      setDeleteDialogOpen(true);
+                    }}
+                    color="error"
+                  >
                     <Delete />
                   </IconButton>
                 </TableCell>
@@ -192,13 +230,31 @@ const Bookings = () => {
         </Table>
       </TableContainer>
 
-      {bookings.length === 0 && <Typography sx={{ mt: 2 }}>No bookings found</Typography>}
+      {bookings.length === 0 && (
+        <Typography sx={{ mt: 2 }}>No bookings found</Typography>
+      )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Edit Booking</DialogTitle>
         <DialogContent>
-          <TextField label="Check-in Date" type="date" value={checkInDate} onChange={(e) => setCheckInDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
-          <TextField label="Check-out Date" type="date" value={checkOutDate} onChange={(e) => setCheckOutDate(e.target.value)} fullWidth margin="dense" InputLabelProps={{ shrink: true }} />
+          <TextField
+            label="Check-in Date"
+            type="date"
+            value={checkInDate}
+            onChange={(e) => setCheckInDate(e.target.value)}
+            fullWidth
+            margin="dense"
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="Check-out Date"
+            type="date"
+            value={checkOutDate}
+            onChange={(e) => setCheckOutDate(e.target.value)}
+            fullWidth
+            margin="dense"
+            InputLabelProps={{ shrink: true }}
+          />
         </DialogContent>
         <DialogActions>
           <IconButton onClick={handleCloseDialog}>Cancel</IconButton>
@@ -206,16 +262,27 @@ const Bookings = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>Are you sure you want to delete this booking?</DialogContent>
+        <DialogContent>
+          Are you sure you want to delete this booking?
+        </DialogContent>
         <DialogActions>
-          <IconButton onClick={() => setDeleteDialogOpen(false)}>Cancel</IconButton>
+          <IconButton onClick={() => setDeleteDialogOpen(false)}>
+            Cancel
+          </IconButton>
           <IconButton onClick={handleDeleteBooking}>Delete</IconButton>
         </DialogActions>
       </Dialog>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
         <Alert severity={snackbarSeverity}>{snackbarMessage}</Alert>
       </Snackbar>
     </Box>
