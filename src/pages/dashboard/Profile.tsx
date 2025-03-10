@@ -1,9 +1,10 @@
 import { ChangeEvent, useState, useEffect } from "react";
 import { UserSchema } from "../../schema/UserSchema";
 import { VisibilityOff, Visibility, Save, Edit } from "@mui/icons-material";
-import { Card, CardHeader, CardContent, TextField, InputAdornment, IconButton, Button, Box, Container, Divider, Snackbar } from "@mui/material";
+import { Card, CardHeader, CardContent, TextField, InputAdornment, IconButton, Button, Box, Container, Divider} from "@mui/material";
 import { AuthService } from "../../services/Auth.service";
 import { userService } from "../../services/User.service";
+import {SlideSnackbar} from "../../components/SlideSnackbar";
 
 export default function Profile() {
     const [isEditing, setIsEditing] = useState(false);
@@ -49,9 +50,13 @@ export default function Profile() {
         setSuccessMessage("");
         setErrorMessage("");
     
-        const { id,password, ...updateData } = userData;
+        const { id, ...updateData } = userData;
+
+        const validationSchema = userData.password === "" 
+        ? UserSchema.fork(['password'], schema => schema.optional()) 
+        : UserSchema;
     
-        const { error } = UserSchema.validate(updateData, { abortEarly: false });
+        const { error } = validationSchema.validate(updateData, { abortEarly: false });
     
         if (error) {
             const validationErrors = error.details.reduce((acc: { [key: string]: string }, curr: any) => {
@@ -73,11 +78,6 @@ export default function Profile() {
             setErrorMessage("Failed to update profile. Please try again.");
             setSnackbarOpen(true);
         }
-    };
-    
-
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);  // Fermer la Snackbar
     };
 
     return (
@@ -156,11 +156,11 @@ export default function Profile() {
                 </CardContent>
             </Card>
 
-            <Snackbar
-                open={snackbarOpen}
-                onClose={handleSnackbarClose}
-                message={successMessage || errorMessage}
-                autoHideDuration={6000}
+            <SlideSnackbar 
+                open={snackbarOpen} 
+                message={successMessage || errorMessage} 
+                severity={successMessage ? "success" : "error"} 
+                onClose={() => setSnackbarOpen(false)} 
             />
         </Container>
     );

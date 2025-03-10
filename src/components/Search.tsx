@@ -18,7 +18,7 @@ export default function Search({ onSearch, placeholder = "Search…", searchServ
   };
 
   return (
-    <FormControl sx={{ width: { xs: '100%', md: '25ch' } }} variant="outlined">
+    <FormControl sx={{ width: { xs: '100%', md: '25ch' } , mx:4}} variant="outlined">
       <OutlinedInput
         size="small"
         id="search"

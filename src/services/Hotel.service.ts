@@ -52,68 +52,88 @@ export const hotelService = {
     }
   },
 
-  async createHotel(hotelData: { name: string; location: string; description?: string; price: number }) {
+  async createHotel(hotelData: IHotel, images: File[]) {
     try {
       const token = AuthService.getToken();
       if (!token) {
         throw new Error('No token found. Please log in.');
       }
-
+  
+      const formData = new FormData();
+      formData.append('name', hotelData.name);
+      formData.append('location', hotelData.location);
+      formData.append('price', hotelData.price?.toString() || '0');
+      formData.append('description', hotelData.description || '');
+      
+        images.forEach((image) => {
+          formData.append('images', image);
+        });
+      
       const response = await fetch(
         `${import.meta.env.VITE_BACK_API_URL}/hotel`,
         {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify(hotelData),
+          body: formData,
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`Error creating hotel: ${response.statusText}`);
-      }
-
+  
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
+  
+      if (!response.ok) {
+        throw new Error(`Error creating hotel: ${data.message || response.statusText}`);
+      }
+  
       return data.data;
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'An error occurred while creating the hotel');
     }
-  },
+  },  
 
   async updateHotel(
     id: string,
-    updateData: { name?: string; location?: string; description?: string; price: number }
+    updateData: IHotel,
+    images: File[] = []
   ) {
     try {
       const token = AuthService.getToken();
       if (!token) {
         throw new Error('No token found. Please log in.');
       }
-
+  
+      const formData = new FormData();
+  
+      if (updateData.name) formData.append('name', updateData.name);
+      if (updateData.location) formData.append('location', updateData.location);
+      if (updateData.price !== undefined) formData.append('price', updateData.price.toString());
+      if (updateData.description) formData.append('description', updateData.description);
+  
+      images.forEach(image => formData.append('images', image));
+  
       const response = await fetch(
         `${import.meta.env.VITE_BACK_API_URL}/hotel/${id}`,
         {
           method: 'PATCH',
           headers: {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
           },
-          body: JSON.stringify(updateData),
+          body: formData,
         }
       );
-
-      if (!response.ok) {
-        throw new Error(`Error updating hotel: ${response.statusText}`);
-      }
-
+  
+      if (!response.ok) throw new Error(`Error updating hotel: ${response.statusText}`);
+  
       const data = await response.json();
       return data.data;
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'An error occurred while updating the hotel');
     }
   },
+  
 
   async deleteHotel(id: string) {
     try {
@@ -142,6 +162,32 @@ export const hotelService = {
     } catch (err) {
       throw new Error(err instanceof Error ? err.message : 'An error occurred while deleting the hotel');
     }
-  }
-};
+  },
 
+  async getHotelById(id:string){
+    try {
+      console.log(id);
+      
+      const response = await fetch(
+        `${import.meta.env.VITE_BACK_API_URL}/hotel/${id}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log(response);
+      
+
+      if (!response.ok) {
+        throw new Error(`Error getting hotel: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (err) {
+      throw new Error(err instanceof Error ? err.message : 'An error occurred while getting the hotel');
+    }
+  },
+};

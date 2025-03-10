@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, ChangeEvent, useEffect } from "react";
+import { styled } from "@mui/system";
 import {
   Modal,
   Box,
@@ -6,22 +7,18 @@ import {
   TextField,
   Button,
   IconButton,
-  Snackbar,
-  Alert,
   FormControl,
   InputLabel,
-  styled,
   OutlinedInput,
-  Select,
-  MenuItem,
   InputAdornment,
+  CircularProgress
 } from "@mui/material";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
 import CloseIcon from "@mui/icons-material/Close";
-import useImageUpload from "./ImageUpload";
-import { AlertColor } from "@mui/material";
+import ImageUpload from "./ImageUpload"; 
 import { HotelSchema } from "../schema/HotelSchema";
-import { Hotel } from "../models/Hotel.interface";
+import { IHotel } from "../models/Hotel.interface";
+import {SlideSnackbar} from "./SlideSnackbar";
+import { hotelService } from "../services/Hotel.service";
 
 const StyledModal = styled(Modal)({
   display: "flex",
@@ -40,76 +37,67 @@ const ModalContent = styled(Box)(({ theme }) => ({
   position: "relative",
 }));
 
-const ImagePreview = styled(Box)({
-  width: "100%",
-  height: "200px",
-  border: "2px dashed #ccc",
-  borderRadius: "4px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  marginBottom: "16px",
-  cursor: "pointer",
-  "&:hover": {
-    borderColor: "#666",
-  },
-});
-
 interface HotelModalProps {
-  isAdmin: boolean;
+  onSuccess?: () => void;
+  hotelToEdit?: IHotel | null; 
+  open: boolean;
+  onClose: () => void;
 }
 
-export const HotelModal = ({ isAdmin }: HotelModalProps) => {
-  const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState<Hotel>({
+export const HotelModal = ({ onSuccess, hotelToEdit, open, onClose }: HotelModalProps) => {
+  const [formData, setFormData] = useState<IHotel>({
     name: "",
     location: "",
     price: 0,
     description: "",
-    picture_list: "",
+    picture_list: [],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState<{
     open: boolean;
     message: string;
-    severity: AlertColor;
+    type?: "success" | "error" | "info"; 
   }>({
     open: false,
     message: "",
-    severity: "success",
   });
 
-  const currencies = ["USD", "EUR", "GBP", "JPY"];
-  const [currency, setCurrency] = useState("USD");
-
-  const { images, handleImageUpload } = useImageUpload();
-
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpen(false);
-    resetForm();
-  };
-
-  const resetForm = () => {
-    setFormData({
-      name: "",
-      location: "",
-      price: 0,
-      description: "",
-      picture_list: "",
-    });
-    setErrors({});
-  };
+  useEffect(() => {
+    if (hotelToEdit) {
+      setFormData(hotelToEdit);
+      const filePromises = hotelToEdit.picture_list?.map(async (picUrl) => {
+        try {
+          return new File([], picUrl, { type: "image/jpeg" });
+        } catch (error) {
+          console.error("Error creating file from URL:", error);
+          return new File([], picUrl);
+        }
+      }) || [];
+      
+      Promise.all(filePromises).then(files => {
+        setImageFiles(files);
+      });
+    } else {
+      setFormData({
+        name: "",
+        location: "",
+        price: 0,
+        description: "",
+        picture_list: [],
+      });
+      setImageFiles([]);
+    }
+  }, [hotelToEdit]);
 
   const validateForm = () => {
     const { error } = HotelSchema.validate(formData, { abortEarly: false });
 
     if (error) {
       const newErrors: { [key: string]: string } = {};
-
       error.details.forEach((detail) => {
-        const fieldName = detail.path[0];
+        const fieldName = String(detail.path[0]);
         newErrors[fieldName] = detail.message;
       });
 
@@ -121,37 +109,92 @@ export const HotelModal = ({ isAdmin }: HotelModalProps) => {
     return true;
   };
 
-  const handleSubmit = () => {
-    if (validateForm()) {
+  const handleDelete = async (id: string) => {
+    try {
+      await hotelService.deleteHotel(id);
       setSnackbar({
         open: true,
-        message: "Hotel information saved successfully!",
-        severity: "success",
+        message: "Hotel deleted successfully!",
+        type: "success",
       });
-      handleClose();
+      if (onSuccess) onSuccess();
+      onClose();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error instanceof Error ? error.message : "Failed to delete hotel",
+        type: "error",
+      });
     }
   };
 
-  if (!isAdmin) {
-    return null;
-  }
+  const handleSubmit = async () => {
+    if (validateForm()) {
+      setIsSubmitting(true);
+      try {
+        if (hotelToEdit) {
+          if (hotelToEdit.id) {
+            await hotelService.updateHotel(hotelToEdit.id, formData, imageFiles);
+          } else {
+            throw new Error("Hotel ID is undefined");
+          }
+          setSnackbar({
+            open: true,
+            message: "Hotel updated successfully!",
+            type: "success",
+          });
+        } else {
+          await hotelService.createHotel(formData, imageFiles);
+          setSnackbar({
+            open: true,
+            message: "Hotel created successfully!",
+            type: "success",
+          });
+        }
+
+        if (onSuccess) onSuccess();
+        onClose(); 
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: error instanceof Error ? error.message : "Failed to save hotel",
+          type: "error",
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleImageUpload = (files: File[]) => {
+    setImageFiles(files);
+    setFormData({
+      ...formData,
+      picture_list: files.length ? files.map(file => URL.createObjectURL(file)) : [],
+    });
+  };
+
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    const parsedValue = parseFloat(inputValue);
+    setFormData({
+      ...formData,
+      price: inputValue === "" || isNaN(parsedValue) ? 0 : parsedValue,
+    });
+  };
 
   return (
     <>
-      <Button variant="contained" onClick={handleOpen}>
-        Add Hotel
-      </Button>
-
       <StyledModal
         open={open}
-        onClose={handleClose}
+        onClose={onClose}
         aria-labelledby="hotel-modal-title"
         aria-describedby="hotel-modal-description"
       >
         <ModalContent>
           <IconButton
             sx={{ position: "absolute", right: 8, top: 8 }}
-            onClick={handleClose}
+            onClick={onClose}
             aria-label="close"
           >
             <CloseIcon />
@@ -163,78 +206,49 @@ export const HotelModal = ({ isAdmin }: HotelModalProps) => {
             id="hotel-modal-title"
             gutterBottom
           >
-            Add Hotel Information
+            {hotelToEdit ? "Edit Hotel Information" : "Add Hotel Information"}
           </Typography>
 
           <Box component="form" sx={{ mt: 2 }}>
-            <ImagePreview
-              sx={{
-                backgroundImage: images[0] ? `url(${images[0].url})` : "none",
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              {!images.length && (
-                <Box sx={{ textAlign: "center" }}>
-                  <FileUploadIcon fontSize="large" />
-                  <Typography>Drag & Drop or Click to Upload Image</Typography>
-                </Box>
-              )}
-              <input
-                type="file"
-                id="image-upload"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                onChange={handleImageUpload}
-                style={{ display: "none" }}
-              />
-            </ImagePreview>
+            <ImageUpload onUpload={handleImageUpload} initialImages={formData.picture_list || []} />
 
             <TextField
               fullWidth
               label="Hotel Name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               error={!!errors.name}
               helperText={errors.name}
               margin="normal"
               required
             />
 
-            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel htmlFor="price">Price</InputLabel>
-                <OutlinedInput
-                  id="price"
-                  value={formData.price}
-                  onChange={(e) =>
-                    setFormData({ ...formData, price: Number(e.target.value) })
-                  }
-                  startAdornment={
-                    <InputAdornment position="start">{currency}</InputAdornment>
-                  }
-                  error={!!errors.price}
-                  label="Price"
-                />
-              </FormControl>
+            <TextField
+              fullWidth
+              label="Location"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+              error={!!errors.location}
+              helperText={errors.location}
+              margin="normal"
+              required
+            />
 
-              <FormControl sx={{ minWidth: 120 }}>
-                <InputLabel>Currency</InputLabel>
-                <Select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  label="Currency"
-                >
-                  {currencies.map((curr) => (
-                    <MenuItem key={curr} value={curr}>
-                      {curr}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
+            <FormControl fullWidth variant="outlined" sx={{ mt: 2, mb: 1 }}>
+              <InputLabel htmlFor="price">Price</InputLabel>
+              <OutlinedInput
+                id="price"
+                value={formData.price === 0 ? "" : formData.price}
+                onChange={handlePriceChange}
+                type="number"
+                inputProps={{ min: 0, step: "0.01" }}
+                startAdornment={<InputAdornment position="start">USD</InputAdornment>}
+                error={!!errors.price}
+                label="Price"
+                placeholder="0"
+              />
+              {errors.price && <Typography variant="caption" color="error">{errors.price}</Typography>}
+            </FormControl>
 
             <TextField
               fullWidth
@@ -242,51 +256,38 @@ export const HotelModal = ({ isAdmin }: HotelModalProps) => {
               rows={4}
               label="Description"
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               error={!!errors.description}
               helperText={errors.description}
               margin="normal"
             />
 
-            <Box
-              sx={{
-                mt: 3,
-                display: "flex",
-                gap: 2,
-                justifyContent: "flex-end",
-              }}
-            >
-              <Button variant="outlined" onClick={handleClose}>
-                Cancel
-              </Button>
+            <Box sx={{ mt: 3, display: "flex", gap: 2, justifyContent: "flex-end" }}>
+              <Button variant="outlined" onClick={onClose}>Cancel</Button>
+              {hotelToEdit && (
+                <Button variant="outlined" color="error" onClick={() => hotelToEdit?.id && handleDelete(hotelToEdit.id)}>
+                  Delete Hotel
+                </Button>
+              )}
               <Button
                 variant="contained"
                 onClick={handleSubmit}
-                disabled={Object.keys(errors).length > 0}
+                disabled={isSubmitting}
+                startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
               >
-                Save
+                {isSubmitting ? "Saving..." : hotelToEdit ? "Save Changes" : "Create"}
               </Button>
             </Box>
           </Box>
         </ModalContent>
       </StyledModal>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          elevation={6}
-          variant="filled"
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      <SlideSnackbar 
+        open={snackbar.open} 
+        message={snackbar.message} 
+        severity={snackbar.type || "info"} 
+        onClose={() => setSnackbar({ ...snackbar, open: false })} 
+      />
     </>
   );
 };

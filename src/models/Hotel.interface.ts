@@ -4,8 +4,8 @@ export interface IHotel {
   id?: string;
   name: string;
   location: string;
-  picture_list: string;
-  description: string;
+  picture_list?: string[];
+  description?: string;
   price: number;
   bookings?: IBooking[];
 }

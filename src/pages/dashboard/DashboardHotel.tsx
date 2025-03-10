@@ -1,12 +1,11 @@
-// src/pages/Hotel.tsx
-import { Box, Typography, CircularProgress, Divider } from "@mui/material";
-import Search from "../../components/Search";
+import { Box, Typography, CircularProgress, Divider, Button } from "@mui/material";
 import { useEffect, useState } from "react";
-import type { IHotel  } from "../../models/Hotel.interface";
+import { IHotel } from "../../models/Hotel.interface";
 import { hotelService } from "../../services/Hotel.service";
-import { HotelCard } from "../../components/Card";
+import { HotelCards } from "../../components/HotelCards";
 import { HotelModal } from "../../components/HotelModal";
 import { AuthService } from "../../services/Auth.service";
+import Search from "../../components/Search";
 
 export const DashboardHotel = () => {
   const [hotels, setHotels] = useState<IHotel[]>([]);
@@ -14,19 +13,17 @@ export const DashboardHotel = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isAdmin, setIsAdmin] = useState(false); 
+  const [open, setOpen] = useState(false);
+  const [selectedHotel, setSelectedHotel] = useState<IHotel | null>(null);
 
   const fetchHotels = async () => {
     try {
       setLoading(true);
       const hotels = await hotelService.getAllHotels();
       setHotels(hotels);
-      setLoading(false);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while fetching hotels"
-      );
+      setError(err instanceof Error ? err.message : "An error occurred while fetching hotels");
+    } finally {
       setLoading(false);
     }
   };
@@ -35,7 +32,6 @@ export const DashboardHotel = () => {
     setSearchQuery(query);
     if (query.trim() === "") {
       fetchHotels();
-      return;
     }
   };
 
@@ -45,14 +41,39 @@ export const DashboardHotel = () => {
       const hotelsData = await hotelService.searchHotels(query);
       setHotels(hotelsData);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "An error occurred while searching hotels"
-      );
+      setError(err instanceof Error ? err.message : "An error occurred while searching hotels");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      setLoading(true);
+      await hotelService.deleteHotel(id);
+      setHotels(prevHotels => prevHotels.filter(hotel => hotel.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred while deleting the hotel");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = (hotelId: string) => {
+    const hotelToEdit = hotels.find(hotel => hotel.id === hotelId);
+    if (hotelToEdit) {
+      setSelectedHotel(hotelToEdit);
+      setOpen(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setSelectedHotel(null);
+    setOpen(false);
+  };
+
+  const handleSuccess = () => {
+    fetchHotels();
   };
 
   useEffect(() => {
@@ -85,11 +106,7 @@ export const DashboardHotel = () => {
           <Typography variant="h4" component="h1">
             Hotels
           </Typography>
-          <Search 
-            onSearch={handleSearch} 
-            searchService={searchHotelsService} 
-            placeholder="Search hotels…" 
-          />
+          <Search onSearch={handleSearch} searchService={searchHotelsService} />
         </Box>
         <Divider sx={{ width: "100%" }} />
         <Box>
@@ -113,15 +130,35 @@ export const DashboardHotel = () => {
               {hotels.length === 0 ? (
                 <Typography variant="body1">No hotels found</Typography>
               ) : (
-                hotels.map((hotel) => (
-                  <HotelCard key={hotel.id} hotel={hotel} />
-                ))
+                <HotelCards 
+                  hotels={hotels} 
+                  isAdmin={isAdmin} 
+                  onDelete={handleDelete}
+                  onEdit={handleEdit}
+                  onDashboard={true}
+                />
               )}
             </Box>
           )}
         </Box>
+        
+        <Button 
+          variant="contained" 
+          onClick={() => {
+            setSelectedHotel(null); 
+            setOpen(true);
+          }}
+        >
+          Add Hotel
+        </Button>
+
+        <HotelModal 
+          open={open} 
+          onClose={handleCloseModal} 
+          hotelToEdit={selectedHotel}
+          onSuccess={handleSuccess}
+        />
       </Box>
-      <HotelModal isAdmin={isAdmin} />
     </>
   );
 };

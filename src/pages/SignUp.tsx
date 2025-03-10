@@ -1,10 +1,7 @@
 import { ChangeEvent, FormEvent, useState } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
 import Divider from "@mui/material/Divider";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import Link from "@mui/material/Link";
@@ -18,6 +15,7 @@ import { UserSchema } from "../schema/UserSchema";
 import { IUser } from "../models/User.interface";
 import { AuthService } from "../services/Auth.service";
 import { useNavigate } from "react-router-dom";
+import {SlideSnackbar} from "../components/SlideSnackbar";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -59,10 +57,13 @@ export default function SignUp() {
     lastname: "",
     email: "",
     password: "",
+    pseudo:""
   });
 
   const navigate = useNavigate();
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -83,22 +84,23 @@ export default function SignUp() {
     setErrors({});
 
     try {
-      const response = await AuthService.signUp(formData)
+      const response = await AuthService.signUp(formData);
       console.log("handleSubmit ", response);
-      
-      navigate("/dashboard")
+
       if (!response) throw new Error("Error during sign up");
 
-      alert("Sign up successful!");
+      setSnackbarMessage("Sign up successful!");
+      setSnackbarOpen(true);
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      alert("An error occurred, please try again.");
+      setSnackbarMessage("An error occurred, please try again.");
+      setSnackbarOpen(true);
     }
   };
 
   return (
     <>
-      <CssBaseline enableColorScheme />
       <SignUpContainer direction="column" justifyContent="center">
         <Card variant="outlined">
           <AkkorIcon />
@@ -141,6 +143,21 @@ export default function SignUp() {
               />
             </FormControl>
             <FormControl>
+              <FormLabel htmlFor="pseudo">Username</FormLabel>
+              <TextField
+                name="pseudo"
+                required
+                fullWidth
+                id="pseudo"
+                placeholder="Jon"
+                value={formData.pseudo}
+                onChange={handleChange}
+                error={!!errors.pseudo}
+                helperText={errors.pseudo}
+                color={errors.pseudo ? "error" : "primary"}
+              />
+            </FormControl>
+            <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
                 required
@@ -173,10 +190,6 @@ export default function SignUp() {
                 color={errors.password ? "error" : "primary"}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive updates via email."
-            />
             <Button type="submit" fullWidth variant="contained">
               Sign up
             </Button>
@@ -210,6 +223,12 @@ export default function SignUp() {
           </Box>
         </Card>
       </SignUpContainer>
+      <SlideSnackbar 
+        open={snackbarOpen} 
+        message={snackbarMessage} 
+        severity="error" 
+        onClose={() => setSnackbarOpen(false)} 
+      />
     </>
   );
 }

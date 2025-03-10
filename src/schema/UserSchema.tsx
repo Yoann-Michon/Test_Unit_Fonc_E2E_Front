@@ -15,6 +15,11 @@ export const UserSchema = Joi.object({
       'string.max': 'Last name cannot exceed 50 characters',
       'string.empty': 'Last name is required'
     }),
+    pseudo: Joi.string().min(2).max(50).required().messages({
+      'string.min': 'Username must be at least 2 characters',
+      'string.max': 'Username cannot exceed 50 characters',
+      'string.empty': 'Username name is required'
+    }),
     password: Joi.string().min(8).max(30).pattern(new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-.]).{8,30}$')).required().messages({
       'string.min': 'Password must be at least 8 characters',
       'string.max': 'Password cannot exceed 30 characters',

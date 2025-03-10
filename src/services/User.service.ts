@@ -51,7 +51,34 @@ export const userService = {
       const data = await response.json();
       return data.data as IUser;
     } catch (error) {
-      console.error(`Error fetching user with ID ${email}:`, error);
+      console.error(`Error fetching user with email ${email}:`, error);
+      throw error;
+    }
+  },
+
+  async getUserById(id: string) {
+    try {
+      const token = AuthService.getToken();
+      if (!token) {
+        throw new Error("No token found. Please log in.");
+      }
+
+      const response = await fetch(`${import.meta.env.VITE_BACK_API_URL}/user/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching user with ID ${id}: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data as IUser;
+    } catch (error) {
+      console.error(`Error fetching user with ID ${id}:`, error);
       throw error;
     }
   },

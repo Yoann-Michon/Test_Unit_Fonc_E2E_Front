@@ -1,4 +1,4 @@
-// src/pages/SignInPage.tsx
+import { useState, FormEvent } from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Checkbox from "@mui/material/Checkbox";
@@ -13,10 +13,10 @@ import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
 import { styled } from "@mui/material/styles";
 import { GoogleIcon, FacebookIcon, AkkorIcon } from "../components/Icons";
-import { FormEvent, useState } from "react";
 import { AuthService } from "../services/Auth.service";
 import { useNavigate } from "react-router-dom";
 import { LoginSchema } from "../schema/LoginSchema";
+import {SlideSnackbar} from "../components/SlideSnackbar";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -42,17 +42,19 @@ const SignInPage = () => {
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
-  const navigate = useNavigate()
+  const [snackbarOpen, setSnackbarOpen] = useState(false); // État pour le Snackbar
+  const [snackbarMessage, setSnackbarMessage] = useState(""); // Message du Snackbar
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     const data = new FormData(event.currentTarget);
     const email = data.get("email") as string;
     const password = data.get("password") as string;
-  
+
     const { error } = LoginSchema.validate({ email, password }, { abortEarly: false });
-  
+
     if (error) {
       error.details.forEach((err) => {
         if (err.context?.key === "email") {
@@ -63,30 +65,32 @@ const SignInPage = () => {
           setPasswordErrorMessage(err.message);
         }
       });
-      return; 
+      setSnackbarMessage("Please fix the errors above.");
+      setSnackbarOpen(true);
+      return;
     }
-  
+
     setEmailError(false);
     setEmailErrorMessage("");
     setPasswordError(false);
     setPasswordErrorMessage("");
-  
+
     try {
       await AuthService.signIn(email, password);
       navigate("/dashboard");
     } catch (error) {
-      console.error(error);
+      setSnackbarMessage("Error logging in. Please try again.");
+      setSnackbarOpen(true);
     }
   };
-  
 
   return (
     <>
-      <Stack direction="column" justifyContent="center" alignItems="center" height='100vh'>
+      <Stack direction="column" justifyContent="center" alignItems="center" height="100vh">
         <Card variant="outlined">
           <AkkorIcon />
           <Typography variant="h4">Sign In</Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{display: 'contents'}}>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ display: "contents" }}>
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
@@ -132,6 +136,12 @@ const SignInPage = () => {
             Don&apos;t have an account? <Link href="/signup">Sign up</Link>
           </Typography>
         </Card>
+        <SlideSnackbar 
+          open={snackbarOpen} 
+          message={snackbarMessage} 
+          severity="error" 
+          onClose={() => setSnackbarOpen(false)} 
+        />
       </Stack>
     </>
   );

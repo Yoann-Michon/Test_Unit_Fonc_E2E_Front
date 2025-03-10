@@ -51,12 +51,13 @@ export default function User() {
     message: '',
     severity: 'success' as 'success' | 'error' | 'info' | 'warning'
   });
-
+  
   useEffect(() => {
     if (!AuthService.isAdmin()) {
       navigate('/');
     } else {
       setIsAdmin(true);
+      fetchUsers();
     }
   }, [navigate]);
 
@@ -189,12 +190,6 @@ export default function User() {
     setSnackbar({ ...snackbar, open: false });
   };
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchUsers();
-    }
-  }, [isAdmin]);
-
   return (
     <>
       <Box
@@ -218,7 +213,7 @@ export default function User() {
           }}
         >
           <Typography variant="h4" component="h1">
-            Gestion des utilisateurs
+            Users
           </Typography>
           <Search
             onSearch={handleSearch}
@@ -239,6 +234,7 @@ export default function User() {
                   <TableCell>Firstname</TableCell>
                   <TableCell>Lastname</TableCell>
                   <TableCell>Email</TableCell>
+                  <TableCell>Username</TableCell>
                   <TableCell>Rôle</TableCell>
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
@@ -258,6 +254,7 @@ export default function User() {
                       <TableCell>{user.firstname}</TableCell>
                       <TableCell>{user.lastname}</TableCell>
                       <TableCell>{user.email}</TableCell>
+                      <TableCell>{user.pseudo}</TableCell>
                       <TableCell>{user.role}</TableCell>
                       <TableCell align="center">
                         <IconButton 

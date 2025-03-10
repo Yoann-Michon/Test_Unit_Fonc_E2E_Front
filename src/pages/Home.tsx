@@ -12,7 +12,6 @@ import {
   IconButton,
   Rating,
   styled,
-  Autocomplete,
   InputAdornment,
   Paper,
   MenuItem,
@@ -28,13 +27,11 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import HotelIcon from "@mui/icons-material/Hotel";
-import Footer from "../components/Footer";
-import Header from "../components/Header";
 import Paris from "../assets/images/Paris.jpg";
 import London from "../assets/images/London.jpg";
 import Newyork from "../assets/images/Newyork.jpg";
 import Tokyo from "../assets/images/Tokyo.jpg";
-import Homepage from "../assets/images/Homepage.jpg";
+import Homepage from "../assets/manuel-moreno-DGa0LQ0yDPc-unsplash.jpg";
 
 const HeroSection = styled(Box)({
     height: "100vh",
@@ -117,7 +114,6 @@ export default function Home() {
 
   return (
     <>
-      <Header />
       <HeroSection>
         <Container>
           <Typography
@@ -315,7 +311,6 @@ export default function Home() {
           ))}
         </Carousel>
       </Container>
-      <Footer />
     </>
   );
 }

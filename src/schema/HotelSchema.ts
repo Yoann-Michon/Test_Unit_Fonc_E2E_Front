@@ -1,5 +1,6 @@
 import Joi from 'joi';
 
+
 export const HotelSchema = Joi.object({
   name: Joi.string()
     .min(3)
@@ -15,7 +16,7 @@ export const HotelSchema = Joi.object({
 
   location: Joi.string()
     .min(3)
-    .max(100)
+    .max(200)
     .required()
     .messages({
       'string.base': '"location" should be a type of text',
@@ -44,13 +45,10 @@ export const HotelSchema = Joi.object({
       'string.max': '"description" should have a maximum length of 500'
     }),
 
-  images: Joi.array()
-    .items(Joi.string().uri())
-    .max(5)
+    picture_list: Joi.alternatives()
+    .try(
+      Joi.string(),
+      Joi.allow(null, '')
+    )
     .optional()
-    .messages({
-      'array.base': '"images" should be an array',
-      'array.items': '"images" should be an array of valid image URLs',
-      'array.max': '"images" can contain a maximum of 5 images'
-    })
 });

@@ -76,12 +76,17 @@ export const AuthService = {
 
   getUserInfo() {
     const decoded = this.decodeToken();
-    console.log(decoded);
-
-    return decoded?.firstname && decoded?.lastname
-      ? `${decoded.firstname} ${decoded.lastname}`
-      : null;
+    if (!decoded) return null;
+    return {
+      id: decoded.sub, 
+      firstname: decoded.firstname,
+      lastname: decoded.lastname,
+      fullName: decoded.firstname && decoded.lastname 
+        ? `${decoded.firstname} ${decoded.lastname}` 
+        : null
+    };
   },
+  
 
   isTokenExpired() {
     const token = this.getToken();
@@ -89,6 +94,8 @@ export const AuthService = {
   
     const decoded = this.decodeToken();
     const currentTime = Date.now() / 1000;
-    return decoded?.exp < currentTime;
+    const exp = decoded?.exp < currentTime
+    if (exp){this.logout()}
+    return exp ;
   }
 };
