@@ -252,7 +252,7 @@ export const DashboardHotelDetails = () => {
 
             <Box mt={2} mb={2} display="flex" flexDirection="column" gap={2}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
+                <DatePicker name='checkIn'
                   label="Check-in"
                   value={checkIn}
                   onChange={(date) => setCheckIn(date)}
@@ -274,7 +274,7 @@ export const DashboardHotelDetails = () => {
               </LocalizationProvider>
 
               <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
+                <DatePicker name='checkOut'
                   label="Check-out"
                   value={checkOut}
                   onChange={(date) => setCheckOut(date)}

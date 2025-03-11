@@ -4,7 +4,7 @@ describe('E2E Tests for DashboardHotel', () => {
     const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5OTkiLCJuYW1lIjoiTGFuYSBSaG9hZGVzIiwiaWF0IjoxNTE2MjM5MDIyfQ.3f04-3zF25zDG_EhH70Z40uZRQL7ghJIzTiAnw3Q5f4'; // Simulé
     const fakeTokenAdmin = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIn0.t9Ep8pvkgIoTsQ-SpUNrVkRa0Y-_jn6s6l6Fe0lJRdQ'
 
-    beforeEach(() => {
+  beforeEach(() => {
       // Simuler la connexion avec le token avant chaque test
       cy.intercept('POST', '/auth/login', (req) => {
         if (req.body.email === userEmail) {
@@ -15,6 +15,7 @@ describe('E2E Tests for DashboardHotel', () => {
               email: req.body.email,
               firstname: 'Lana',
               lastname: 'Rhoades',
+              id: "3",
             },
           });
         }
@@ -63,10 +64,9 @@ describe('E2E Tests for DashboardHotel', () => {
   
         cy.wait('@fetchHotels');
     });
-  
+  describe('Hotel', () =>{
     it('should fetch and display hotels', () => {
     
-        cy.visit('/dashboard/hotel');
       // Ajout du token dans les headers de la requête API
         cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
             req.headers['Authorization'] = `Bearer ${fakeToken}`;
@@ -106,7 +106,6 @@ describe('E2E Tests for DashboardHotel', () => {
     });
   
     it('should search hotels', () => {
-      cy.visit('/dashboard/hotel');
 
       cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeToken}`;
@@ -178,8 +177,6 @@ describe('E2E Tests for DashboardHotel', () => {
           body: { id: '3', name: 'New Hotel', location: 'New Location' },
         });
       }).as('addHotel');
-  
-      cy.visit('/dashboard/hotel');
   
       // Cliquer sur le bouton pour ajouter un hôtel
       cy.get('button').contains('Add Hotel').click();
@@ -264,5 +261,114 @@ describe('E2E Tests for DashboardHotel', () => {
       // Vérifier l'affichage de l'erreur
       cy.contains('Error fetching hotels: Internal Server Error').should('be.visible');
     });
-  });
+
+    it('should hotel not found', () =>{
+      
+      cy.intercept('GET', '/hotel/1', (req) => {
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
+        req.reply({
+          statusCode: 201,
+          body: {
+            "id": "1",
+            "name": "Hotel 1",
+            "location": "Location 1",
+            "description": "superbe hotel",
+            "picture_list": [],
+            "price": 1
+          },
+        });
+      }).as('fetchHotel');
+      
+      cy.get('a').contains('See more').first().click();
+
+      cy.wait('@fetchHotel');
+
+      cy.contains('Hotel not found').should('be.visible');
+    });
+
+    it('should booking hotel', () =>{
+      
+      cy.intercept('GET', '/hotel/1', (req) => {
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
+        req.reply({
+          statusCode: 200,
+          body: {
+            "statusCode": 200,
+            "message": "Hotel retrieved successfully",
+            "data": {
+              "id": "1",
+              "name": "Hotel 1",
+              "location": "Location 1",
+              "description": "superbe hotel",
+              "picture_list": [],
+              "price": 1
+            }
+          },
+        });
+      }).as('fetchHotel');
+
+      cy.intercept('POST', '/booking', (req) => {
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
+        req.reply({
+          statusCode: 200,
+          body: {
+            "statusCode": 200,
+            "message": "Booking successfully",
+            "data": {
+              "id": "1",
+              "checkInDate": "03/11/2025",
+              "checkOutDate": "03/15/2025",
+              "createdAt":"03/11/2025",
+              "userId": "3",
+              "hotelId": "1",
+              "name": "Hotel 1",
+              "price": 1
+            }
+          },
+        });
+      }).as('bookingHotel');
+
+      cy.intercept('GET', '/booking', (req) => {
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
+        req.reply({
+          statusCode: 200,
+          body: {
+            "statusCode": 200,
+            "message": "Booking successfully",
+            "data": {
+              "id": "1",
+              "checkInDate": "03/11/2025",
+              "checkOutDate": "03/15/2025",
+              "createdAt":"03/11/2025",
+              "userId": "3",
+              "hotelId": "1",
+              "name": "Hotel 1",
+              "price": 1
+            }
+          },
+        });
+      }).as('booking');
+      
+      cy.get('a').contains('See more').first().click();
+
+      cy.wait('@fetchHotel');
+
+      cy.get('input[name="checkIn"]').type('03/11/2025');
+      cy.get('input[name="checkOut"]').type('03/15/2025');
+
+      cy.get('button').contains('Book Now').click();
+
+      cy.wait('@bookingHotel');
+
+      cy.contains('Booking successfully created!').should('be.visible');
+
+      cy.wait('@booking');
+
+    })
+
+    }); 
+  })
+
+
+
   

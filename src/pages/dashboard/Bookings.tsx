@@ -208,13 +208,13 @@ const Bookings = () => {
                   </TableCell>
                 )}
                 <TableCell>
-                  <IconButton
+                  <IconButton name='edit'
                     onClick={() => handleEditBooking(booking)}
                     color="primary"
                   >
                     <Edit />
                   </IconButton>
-                  <IconButton
+                  <IconButton name ='delete'
                     onClick={() => {
                       setBookingToDelete(booking);
                       setDeleteDialogOpen(true);
