@@ -92,7 +92,7 @@ export const HotelCards = ({
                   </IconButton>
                   {isAdmin && (
                     <Box display="flex" justifyContent="space-between">
-                      <IconButton
+                      <IconButton name="edit"
                         onClick={() =>
                           hotel.id && onEdit && onEdit(hotel.id, hotel)
                         }
@@ -100,7 +100,7 @@ export const HotelCards = ({
                       >
                         <EditIcon sx={{ fontSize: 20 }} />
                       </IconButton>
-                      <IconButton
+                      <IconButton name="delete"
                         onClick={() =>
                           hotel.id && onDelete && onDelete(hotel.id)
                         }
