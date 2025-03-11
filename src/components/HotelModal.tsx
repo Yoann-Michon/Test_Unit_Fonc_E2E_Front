@@ -76,8 +76,7 @@ export const HotelModal = ({
         ...hotelToEdit,
         picture_list: hotelToEdit.picture_list || []
       });
-      // Ne pas essayer de convertir les URLs en fichiers
-      setImageFiles([]); // Liste vide pour les nouvelles images à télécharger
+      setImageFiles([]);
     } else {
       setFormData({
         name: "",
@@ -100,7 +99,6 @@ export const HotelModal = ({
         const fieldName = String(detail.path[0]);
         newErrors[fieldName] = detail.message;
       });
-
       setErrors(newErrors);
       return false;
     }
@@ -133,19 +131,18 @@ export const HotelModal = ({
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        // Prepare the data for submission - remove temporary URLs from actual data to be sent
+        
         const dataToSubmit = {
           ...formData,
-          // Don't send the temporary URLs for new images as they're being sent as Files
           picture_list: hotelToEdit?.picture_list || []
         };
-
+        
         if (hotelToEdit) {
           if (hotelToEdit.id) {
             await hotelService.updateHotel(
               hotelToEdit.id,
               dataToSubmit,
-              imageFiles // Only send new images as files
+              imageFiles
             );
           } else {
             throw new Error("Hotel ID is undefined");
@@ -182,10 +179,8 @@ export const HotelModal = ({
   const handleImageUpload = (files: File[]) => {
     setImageFiles(files);
     
-    // Create temporary URLs for preview only
     const newImageUrls = files.map(file => URL.createObjectURL(file));
     
-    // Keep track of existing images in the UI
     setFormData(prev => ({
       ...prev,
       picture_list: [...(prev.picture_list || []), ...newImageUrls]

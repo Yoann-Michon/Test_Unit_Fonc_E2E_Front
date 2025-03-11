@@ -72,6 +72,7 @@ export const hotelService = {
       const formData = new FormData();
       formData.append("name", hotelData.name);
       formData.append("location", hotelData.location);
+      formData.append("street", hotelData.street);
       formData.append("price", hotelData.price?.toString() || "0");
       formData.append("description", hotelData.description || "");
 

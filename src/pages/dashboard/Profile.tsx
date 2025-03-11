@@ -84,8 +84,6 @@ export default function Profile() {
         },
         {}
       );
-      console.log(error);
-
       setErrors(validationErrors);
       return;
     }
@@ -103,7 +101,6 @@ export default function Profile() {
       setSuccessMessage("Profile successfully updated!");
       setSnackbarOpen(true);
     } catch (error) {
-      console.error("Save error:", error);
       setErrorMessage("Failed to update profile. Please try again.");
       setSnackbarOpen(true);
     }
