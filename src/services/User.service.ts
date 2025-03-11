@@ -158,8 +158,6 @@ export const userService = {
       if (!token) {
         throw new Error("No token found. Please log in.");
       }
-      console.log(userData);
-      
       const response = await fetch(
         `${import.meta.env.VITE_BACK_API_URL}/user/${id}`,
         {

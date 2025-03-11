@@ -142,15 +142,17 @@ export const DashboardHotel = () => {
           )}
         </Box>
         
-        <Button 
-          variant="contained" 
-          onClick={() => {
-            setSelectedHotel(null); 
-            setOpen(true);
-          }}
-        >
-          Add Hotel
-        </Button>
+        {isAdmin && (
+          <Button 
+            variant="contained" 
+            onClick={() => {
+              setSelectedHotel(null); 
+              setOpen(true);
+            }}
+          >
+            Add Hotel
+          </Button>
+        )}
 
         <HotelModal 
           open={open} 

@@ -22,7 +22,7 @@ export const bookingService = {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -38,7 +38,7 @@ export const bookingService = {
       }
 
       const data = await response.json();
-      
+
       return data.data as IBooking[];
     } catch (err) {
       const errorMessage =
@@ -68,7 +68,7 @@ export const bookingService = {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -96,7 +96,7 @@ export const bookingService = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(bookingData),
         }
@@ -126,7 +126,7 @@ export const bookingService = {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(updateData),
         }
@@ -164,7 +164,7 @@ export const bookingService = {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

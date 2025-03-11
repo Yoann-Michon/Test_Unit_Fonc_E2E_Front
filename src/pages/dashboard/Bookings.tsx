@@ -201,7 +201,7 @@ const Bookings = () => {
                 <TableCell>
                   {new Date(booking.checkOutDate).toLocaleDateString()}
                 </TableCell>
-                <TableCell>{booking.totalPrice} €</TableCell>
+                <TableCell> €</TableCell>
                 {isAdmin && (
                   <TableCell>
                     {booking.user?.firstname} {booking.user?.lastname}
@@ -214,15 +214,17 @@ const Bookings = () => {
                   >
                     <Edit />
                   </IconButton>
-                  <IconButton
-                    onClick={() => {
-                      setBookingToDelete(booking);
-                      setDeleteDialogOpen(true);
-                    }}
-                    color="error"
-                  >
-                    <Delete />
-                  </IconButton>
+                  {isAdmin && (
+                    <IconButton
+                      onClick={() => {
+                        setBookingToDelete(booking);
+                        setDeleteDialogOpen(true);
+                      }}
+                      color="error"
+                    >
+                      <Delete />
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
