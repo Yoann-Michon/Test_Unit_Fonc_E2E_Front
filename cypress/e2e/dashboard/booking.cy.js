@@ -2,12 +2,11 @@ describe("Bookings Page", () => {
     const userEmail = 'Eva@example.com';
     const password = 'EvaElfie1234.';
     const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5OTkiLCJuYW1lIjoiTGFuYSBSaG9hZGVzIiwiaWF0IjoxNTE2MjM5MDIyfQ.3f04-3zF25zDG_EhH70Z40uZRQL7ghJIzTiAnw3Q5f4'; // Simulé
-    const fakeTokenAdmin = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIn0.t9Ep8pvkgIoTsQ-SpUNrVkRa0Y-_jn6s6l6Fe0lJRdQ';
+    const fakeTokenAdmin = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIiwiZW1haWwiOiJFdmFAZXhhbXBsZS5jb20iLCJwc2V1ZG8iOiJFdmEgRWxmaWUiLCJmaXJzdG5hbWUiOiJFdmEiLCJsYXN0bmFtZSI6IkVsZmllIn0.jZzZizI2ifzTyURJAy1Du3uF3Ly09-YX2QguC45A64geyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIiwiZW1haWwiOiJFdmFAZXhhbXBsZS5jb20iLCJwc2V1ZG8iOiJFdmEgRWxmaWUiLCJmaXJzdG5hbWUiOiJFdmEiLCJsYXN0bmFtZSI6IkVsZmllIn0.jZzZizI2ifzTyURJAy1Du3uF3Ly09-YX2QguC45A64g';
 
   beforeEach(() => {
       // Simuler la connexion avec le token avant chaque test
       cy.intercept('POST', '/auth/login', (req) => {
-        if (req.body.email === userEmail) {
           req.reply({
             statusCode: 200,
             body: {
@@ -18,7 +17,6 @@ describe("Bookings Page", () => {
               id: "1",
             },
           });
-        }
       }).as('loginRequest');
   
       cy.visit('/signin');
@@ -116,7 +114,7 @@ describe("Bookings Page", () => {
             cy.get("table tbody tr").should("have.length.greaterThan", 0); // Vérifie qu'il y a au moins une ligne dans le tableau
         });    
 
-        it("should allow admin to edit a booking", () => {
+        it("should display Booking updated successfully when edit a booking", () => {
             cy.intercept('PATCH', '/booking/3', (req) => {
                 req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
                 req.reply({
@@ -171,7 +169,7 @@ describe("Bookings Page", () => {
             cy.get(".MuiAlert-root").should("contain", "Booking updated successfully");
         });
 
-        it("should allow admin to delete a booking", () => {
+        it("should display Booking deleted successfully when delete a booking", () => {
 
             cy.intercept('DELETE', '/booking/3', (req) => {
                 req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;

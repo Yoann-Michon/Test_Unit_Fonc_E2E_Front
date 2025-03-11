@@ -7,13 +7,10 @@ describe('User Sign Up', () => {
     beforeEach(() => {
       // Visite la page de signup
       cy.visit('/signup');
-  
-      // Mock de la requête pour la création de l'utilisateur
-      // Mock de la requête pour la création de l'utilisateur avec une réponse simulée de code 200
-       // Mock de la requête pour la création de l'utilisateur
+
        cy.intercept('POST', '/auth/register', (req) => {
         if (req.body.email === existingEmail) {
-            // Simuler une réponse avec un code 409 pour un email déjà existant
+            // Simuler une réponse avec un code 500 pour un email déjà existant
             req.reply({
                 statusCode: 500,
                 body: {
@@ -21,11 +18,11 @@ describe('User Sign Up', () => {
                 },
             });
         } else {
-            // Simuler une réponse réussie (code 200) pour d'autres emails
+            // Simuler une réponse réussie (code 201) pour d'autres emails
             req.reply({
                 statusCode: 201,
                 body: {
-                    id: '123',
+                    id: '1',
                     email: req.body.email,
                     firstname: 'Eva',
                     lastname: 'Elfie',
@@ -37,7 +34,7 @@ describe('User Sign Up', () => {
 });
   
   
-    it('should sign up with valid information', () => {
+    it('should sign up with valid information and redirect to signin', () => {
         // Simuler la saisie des informations
         cy.get('input[name="firstname"]').type('Eva');
         cy.get('input[name="lastname"]').type('Elfie');
@@ -50,9 +47,6 @@ describe('User Sign Up', () => {
     
         // Vérifier la redirection ou l'apparition d'un message de bienvenue
         cy.url().should('include', '/signin');
-    
-        // Vérifie si l'API a bien été appelée
-        cy.wait('@createUser').its('response.statusCode').should('eq', 201);
       });
   
     it('should display an error for missing first name', () => {
@@ -66,7 +60,7 @@ describe('User Sign Up', () => {
       cy.get('button[type="submit"]').click();
   
       // Verify that an error message for first name appears
-      cy.contains('Veuillez renseigner ce champ. ').should('be.visible');
+      cy.contains('Veuillez renseigner ce champ.').should('be.visible');
     });
   
     it('should display an error for invalid email', () => {

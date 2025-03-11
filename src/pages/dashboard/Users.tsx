@@ -260,14 +260,14 @@ export default function User() {
                       <TableCell>{user.pseudo}</TableCell>
                       <TableCell>{user.role}</TableCell>
                       <TableCell align="center">
-                        <IconButton 
+                        <IconButton name ="edit"
                           aria-label="edit" 
                           color="primary" 
                           onClick={() => handleEditClick(user)}
                         >
                           <EditIcon />
                         </IconButton>
-                        <IconButton 
+                        <IconButton  name ="delete"
                           aria-label="delete" 
                           color="error" 
                           onClick={() => handleDeleteClick(user)}

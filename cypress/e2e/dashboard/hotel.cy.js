@@ -1,8 +1,7 @@
 describe('E2E Tests for DashboardHotel', () => {
     const userEmail = 'Lana@example.com';
     const password = 'EvaElfie1234.';
-    const fakeToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI5OTkiLCJuYW1lIjoiTGFuYSBSaG9hZGVzIiwiaWF0IjoxNTE2MjM5MDIyfQ.3f04-3zF25zDG_EhH70Z40uZRQL7ghJIzTiAnw3Q5f4'; // Simulé
-    const fakeTokenAdmin = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIn0.t9Ep8pvkgIoTsQ-SpUNrVkRa0Y-_jn6s6l6Fe0lJRdQ'
+    const fakeTokenAdmin = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIiwiZW1haWwiOiJFdmFAZXhhbXBsZS5jb20iLCJwc2V1ZG8iOiJFdmEgRWxmaWUiLCJmaXJzdG5hbWUiOiJFdmEiLCJsYXN0bmFtZSI6IkVsZmllIn0.jZzZizI2ifzTyURJAy1Du3uF3Ly09-YX2QguC45A64g'
 
   beforeEach(() => {
       // Simuler la connexion avec le token avant chaque test
@@ -33,7 +32,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.visit('/dashboard/hotel');
       // Ajout du token dans les headers de la requête API
         cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
-            req.headers['Authorization'] = `Bearer ${fakeToken}`;
+            req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
             req.reply({
             statusCode: 200,
             message: "Hotels retrieved successfully",
@@ -69,7 +68,7 @@ describe('E2E Tests for DashboardHotel', () => {
     
       // Ajout du token dans les headers de la requête API
         cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
-            req.headers['Authorization'] = `Bearer ${fakeToken}`;
+            req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
             req.reply({
             statusCode: 200,
             message: "Hotels retrieved successfully",
@@ -107,8 +106,8 @@ describe('E2E Tests for DashboardHotel', () => {
   
     it('should search hotels', () => {
 
-      cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
-        req.headers['Authorization'] = `Bearer ${fakeToken}`;
+    cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
         req.reply({
         statusCode: 200,
         message: "Hotels retrieved successfully",
@@ -138,7 +137,7 @@ describe('E2E Tests for DashboardHotel', () => {
     }).as('fetchHotels');
     
     cy.intercept('GET', 'hotel/search/La%20maison%20de%20constant', (req) => {
-        req.headers['Authorization'] = `Bearer ${fakeToken}`;
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
         req.reply({
         statusCode: 200,
         message: "Hotels retrieved successfully",
@@ -169,7 +168,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('La maison de constant').should('be.visible');
     });
   
-    it('should add a new hotel', () => {
+    it('should display Hotel created successfully! when add a new hotel', () => {
       cy.intercept('POST', '/hotel', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
         req.reply({
@@ -196,7 +195,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('Hotel created successfully!').should('be.visible');
     });
 
-    it('should update hotel', () => {
+    it('should display Hotel updated successfully! when update hotel', () => {
       cy.intercept('PATCH', '/hotel/1', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
         req.reply({
@@ -225,7 +224,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('Hotel updated successfully!').should('be.visible');
     });
   
-    it('should delete a hotel', () => {
+    it('should dispare hotel when delete a hotel', () => {
       cy.intercept('DELETE', '/hotel/1', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
         req.reply({
@@ -247,7 +246,7 @@ describe('E2E Tests for DashboardHotel', () => {
   
     it('should handle errors correctly', () => {
       cy.intercept('GET', '/hotel?limit=10&sortBy=name&order=ASC', (req) => {
-        req.headers['Authorization'] = `Bearer ${fakeToken}`;
+        req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
         req.reply({
           statusCode: 500,
           body: { error: 'Failed to fetch hotels' },
@@ -262,7 +261,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('Error fetching hotels: Internal Server Error').should('be.visible');
     });
 
-    it('should hotel not found', () =>{
+    it('should dispaly hotel not found', () =>{
       
       cy.intercept('GET', '/hotel/1', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
@@ -286,7 +285,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('Hotel not found').should('be.visible');
     });
 
-    it('should booking hotel', () =>{
+    it('should display Booking successfully created! when booking hotel', () =>{
       
       cy.intercept('GET', '/hotel/1', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
