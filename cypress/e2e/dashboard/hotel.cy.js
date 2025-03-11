@@ -285,7 +285,7 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('Hotel not found').should('be.visible');
     });
 
-    it('should display Booking successfully created! when booking hotel', () =>{
+    it('should display Booking successfully created! when booking hotel and redirect to Bookind dashboard', () =>{
       
       cy.intercept('GET', '/hotel/1', (req) => {
         req.headers['Authorization'] = `Bearer ${fakeTokenAdmin}`;
@@ -332,19 +332,41 @@ describe('E2E Tests for DashboardHotel', () => {
         req.reply({
           statusCode: 200,
           body: {
-            "statusCode": 200,
-            "message": "Booking successfully",
-            "data": {
-              "id": "1",
-              "checkInDate": "03/11/2025",
-              "checkOutDate": "03/15/2025",
-              "createdAt":"03/11/2025",
-              "userId": "3",
-              "hotelId": "1",
-              "name": "Hotel 1",
-              "price": 1
-            }
-          },
+            message: "Booking edit successfully",
+            data: [
+                {
+                    id: "3",
+                    checkInDate: "2025-03-11T23:00:00.000Z",
+                    checkOutDate: "2025-03-15T23:00:00.000Z",
+                    createdAt: "2025-03-10T23:17:58.000Z",
+                    user: {
+                        id: "3",
+                        firstname: "Eva",
+                        lastname: "Elfie",
+                        email: userEmail,
+                        pseudo: "Eva",
+                        role: "admin"
+                    },
+                    hotel: {
+                        id: "1",
+                        name: "Chez Constant",
+                        street: "26 Rue Villon, 8e arr., 69008 Lyon",
+                        location: "France",
+                        description: "L'Hotel Le Lumière est situé à seulement 450 mètres de la station de métro Sans-Souci permettant de rejoindre directement le centre historique de Lyon. L'établissement vous propose un hébergement 2 étoiles affichant un décor inspiré du cinéma. Les chambres ont été décorées sobrement et disposent d'une télévision à écran LCD. Chacune comporte également du matériel de repassage, une connexion Wi-Fi gratuite et une salle de bains privative avec articles de toilette gratuits.",
+                        picture_list: [
+                            "https://i.ibb.co/FkDZdMqz/180052554.jpg",
+                            "https://i.ibb.co/zWKHn4G4/654909359.jpg",
+                            "https://i.ibb.co/FLLYgFSr/28170419.jpg",
+                            "https://i.ibb.co/ynnTdgzh/654909352.jpg",
+                            "https://i.ibb.co/zTVfwnB5/180051921.jpg",
+                            "https://i.ibb.co/Ndpdg5wM/654921574.jpg",
+                            "https://i.ibb.co/whKywh1r/616413440.jpg"
+                        ],
+                        price: 70
+                    }
+                }
+            ]
+        },
         });
       }).as('booking');
       
@@ -362,6 +384,8 @@ describe('E2E Tests for DashboardHotel', () => {
       cy.contains('Booking successfully created!').should('be.visible');
 
       cy.wait('@booking');
+
+      cy.url().should('include', '/dashboard/booking');
 
     })
 

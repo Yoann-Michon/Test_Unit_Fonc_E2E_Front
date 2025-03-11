@@ -1,5 +1,5 @@
 describe('E2E Tests for DashboardProfil', () => {
-    const userEmail = 'Eva@example.com';
+    const userEmail = 'eva@example.com';
     const password = 'EvaElfie1234.';
     const fakeTokenAdmin = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwibmFtZSI6IkV2YSBFbGZpZSIsImlhdCI6MTUxNjIzOTAyMiwicm9sZSI6ImFkbWluIiwiZW1haWwiOiJFdmFAZXhhbXBsZS5jb20iLCJwc2V1ZG8iOiJFdmEgRWxmaWUiLCJmaXJzdG5hbWUiOiJFdmEiLCJsYXN0bmFtZSI6IkVsZmllIn0.jZzZizI2ifzTyURJAy1Du3uF3Ly09-YX2QguC45A64g'
 
@@ -19,6 +19,7 @@ describe('E2E Tests for DashboardProfil', () => {
       }).as('loginRequest');
   
       cy.visit('/signin');
+      cy.wait(1000);
   
       cy.get('input[name="email"]').type(userEmail);
       cy.get('input[name="password"]').type(password);

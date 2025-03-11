@@ -58,7 +58,7 @@ describe('User Sign Up', () => {
   
       // Submit the form
       cy.get('button[type="submit"]').click();
-  
+      
       // Verify that an error message for first name appears
       cy.contains('Veuillez renseigner ce champ.').should('be.visible');
     });

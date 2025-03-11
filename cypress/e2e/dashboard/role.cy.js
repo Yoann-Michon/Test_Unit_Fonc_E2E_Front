@@ -101,7 +101,7 @@ describe('role display', () => {
             cy.visit('/dashboard/booking');
             cy.wait('@fetchBooking');
 
-            cy.get('button[name="delete"]').should('not exist');
+            cy.get('button[name="delete"]').should('not.exist');
         });
     });
 
