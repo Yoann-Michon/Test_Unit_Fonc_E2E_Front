@@ -236,6 +236,7 @@ export const HotelModal = ({
             <TextField
               fullWidth
               label="Hotel Name"
+              name="HotelName"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -249,6 +250,7 @@ export const HotelModal = ({
             <TextField
               fullWidth
               label="Street"
+              name="Street"
               value={formData.street}
               onChange={(e) =>
                 setFormData({ ...formData, street: e.target.value })
@@ -261,6 +263,7 @@ export const HotelModal = ({
             <TextField
               fullWidth
               label="Location"
+              name="Location"
               value={formData.location}
               onChange={(e) =>
                 setFormData({ ...formData, location: e.target.value })
@@ -284,6 +287,7 @@ export const HotelModal = ({
                 }
                 error={!!errors.price}
                 label="Price"
+                name="Price"
                 placeholder="0"
               />
               {errors.price && (
@@ -298,6 +302,7 @@ export const HotelModal = ({
               multiline
               rows={4}
               label="Description"
+              name="Description"
               value={formData.description}
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })

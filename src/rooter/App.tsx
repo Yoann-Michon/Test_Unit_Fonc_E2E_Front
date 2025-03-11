@@ -17,6 +17,7 @@ import { DashboardHotel } from "../pages/dashboard/DashboardHotel";
 import { AuthService } from "../services/Auth.service";
 import { HotelDetails } from "../pages/HotelDetails";
 import { DashboardHotelDetails } from "../pages/dashboard/DashboardHotelDetails";
+import Booking from "../pages/dashboard/Bookings";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 
@@ -54,6 +55,7 @@ const App = () => {
             <Route path="hotel/:id" element={<DashboardHotelDetails />} />
             <Route path="user" element={<User />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="booking" element={<Booking />} />
           </Route>
         </Route>
       </Routes>
